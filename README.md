@@ -1,31 +1,24 @@
-# Disease Predictor — Project Structure
+# AI- Powered Disease Predictor Web-App
 
 ```
-disease_predictor/
-│
-├── app.py                  ← Flask backend (main file)
-├── requirements.txt        ← Python dependencies
-├── Procfile                ← For Render deployment
-│
-├── model/
-│   ├── model.pkl           ← Trained ML model (copy from Colab)
-│   ├── symptom_columns.json← Symptom column order (copy from Colab)
-│   └── filter_rules.pkl    ← Post-filter rules (copy from Colab)
-│
-├── templates/
-│   └── index.html          ← Frontend (Day 5)
-│
-└── static/
-    ├── css/
-    │   └── style.css       ← Styles (Day 5)
-    └── js/
-        └── app.js          ← Frontend logic (Day 5)
+A web-based disease prediction tool built with Python, Flask, and scikit-learn. 
+Users input their symptoms through a smart autocomplete interface and receive 
+an AI-generated prediction with confidence score and disease description. 
+
+The model is trained on a dataset of 41 diseases and ~130 symptoms using 
+Random Forest, Decision Tree, and Naive Bayes classifiers. Predictions are 
+refined using clinical post-filters based on onset, episode history, and 
+neurological deficit.
+
+Built with: Python · Flask · scikit-learn · HTML · CSS · JavaScript
 ```
+<img width="913" height="686" alt="image" src="https://github.com/user-attachments/assets/932d53d0-775a-4837-ae66-d885dad0b784" />
+
 
 ## Running locally
 ```bash
 pip install -r requirements.txt
-python app.py
+py app.py
 ```
 Then open http://localhost:5000
 
