@@ -19,7 +19,6 @@ filter_rules   = pickle.load(open(os.path.join(BASE, 'model', 'filter_rules.pkl'
 
 ALL_SYMPTOMS   = sorted(symptom_cols)   # used for autocomplete
 
-
 # ── Disease descriptions (shown in streaming response) ────────────────────
 DISEASE_INFO = {
     "Fungal infection"        : "A fungal infection caused by dermatophytes affecting skin, nails, or scalp.",
