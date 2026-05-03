@@ -128,6 +128,13 @@ def predict():
     if not symptoms:
         return jsonify({'error': 'No symptoms provided'}), 400
 
+    valid_symptoms = [s for s in symptoms if s in symptom_cols]
+    if not valid_symptoms:
+        return jsonify({'error': 'No valid symptoms recognized. Please select from the suggestions.'}), 400
+    if len(valid_symptoms) < 2:
+        return jsonify({'error': 'Please enter at least 2 valid symptoms for accurate prediction.'}), 400
+    symptoms = valid_symptoms
+
     # Build input vector
     vec = [1 if s in symptoms else 0 for s in symptom_cols]
     input_df = __import__('pandas').DataFrame([vec], columns=symptom_cols)

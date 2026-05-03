@@ -1126,6 +1126,15 @@
         aiBubble.appendChild(aiContent);
         typingEl.replaceWith(aiBubble);
 
+        if (!res.ok) {
+          const err = await res.json();
+          typingEl.remove()
+          appendError(err.error || 'Invalid input.');
+          isLoading = false;
+          updateSendBtn();
+          return;
+        }
+
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let rawText = '';
