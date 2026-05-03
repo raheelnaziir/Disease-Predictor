@@ -12,6 +12,8 @@ neurological deficit.
 
 Built with: Python · Flask · scikit-learn · HTML · CSS · JavaScript
 ```
+<img width="913" height="686" alt="image" src="https://github.com/user-attachments/assets/932d53d0-775a-4837-ae66-d885dad0b784" />
+
 
 ## Running locally
 ```bash
