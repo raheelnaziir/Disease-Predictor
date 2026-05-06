@@ -1,305 +1,1455 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Disease Predictor</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap"
+    rel="stylesheet" />
   <style>
-    :root{--bg:#f0f2f5;--surface:#ffffff;--surface2:#f7f8fa;--border:#e8eaed;--text:#1a1d23;--text2:#6b7280;--text3:#9ca3af;--accent:#2563eb;--accent-s:#1d4ed8;--accent-bg:#eff6ff;--tag-bg:#e0eaff;--tag-text:#2563eb;--danger:#ef4444;--success:#10b981;--shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.06);--shadow-lg:0 8px 40px rgba(0,0,0,.10);--r:16px;--r-sm:10px;--transition:.2s cubic-bezier(.4,0,.2,1)}
-    [data-theme="dark"]{--bg:#212121;--surface:#2f2f2f;--surface2:#3a3a3a;--border:#4a4a4a;--text:#ececec;--text2:#b4b4b4;--text3:#6e6e6e;--accent:#4f80ff;--accent-s:#3b6bef;--accent-bg:#1a2240;--tag-bg:#2a3a60;--tag-text:#7ba4ff;--shadow:0 1px 3px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.4);--shadow-lg:0 8px 40px rgba(0,0,0,.6)}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);transition:background var(--transition),color var(--transition)}
-    button{cursor:pointer;border:none;background:none;font-family:inherit}input{font-family:inherit}
-    body{display:flex;min-height:100vh;padding:0;margin:0}
-    .app{width:100%;height:100vh;background:var(--surface);display:flex;flex-direction:column;overflow:hidden;transition:background var(--transition)}
-    .header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--border);flex-shrink:0}
-    .logo{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;color:var(--text)}.logo svg{color:var(--accent)}
-    .header-actions{display:flex;gap:8px}
-    .icon-btn{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:background var(--transition),color var(--transition)}.icon-btn:hover{background:var(--surface2);color:var(--text)}
-    .main{flex:1;overflow-y:auto;padding:32px 28px 20px;display:flex;flex-direction:column;gap:20px;scroll-behavior:smooth}
-    .main::-webkit-scrollbar{width:4px}.main::-webkit-scrollbar-track{background:transparent}.main::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-    .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;animation:fadeIn .5s ease}
-    .empty-icon{width:64px;height:64px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3)}
-    .empty h2{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;color:var(--text)}.empty p{font-size:14px;color:var(--text2);text-align:center;max-width:280px;line-height:1.6}
-    .msg{animation:slideUp .3s ease}
-    .msg-user{display:flex;justify-content:flex-end}
-    .msg-user .bubble{background:var(--accent);color:#fff;padding:12px 18px;border-radius:18px 18px 4px 18px;max-width:75%;font-size:14px;line-height:1.6}
-    .msg-user .bubble .tag-pill{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3)}
-    .msg-ai{display:flex;gap:12px;align-items:flex-start}
-    .ai-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent)}
-    .bubble-ai{background:var(--surface2);border:1px solid var(--border);padding:16px 20px;border-radius:4px 18px 18px 18px;max-width:80%;font-size:14px;line-height:1.8;color:var(--text)}
-    .bubble-ai h2{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;color:var(--text);margin-bottom:8px;margin-top:4px}
-    .bubble-ai h3{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 6px}
-    .bubble-ai strong{color:var(--text);font-weight:600}.bubble-ai ul{padding-left:16px;display:flex;flex-direction:column;gap:4px}.bubble-ai li{color:var(--text2)}
-    .bubble-ai hr{border:none;border-top:1px solid var(--border);margin:12px 0}.bubble-ai em{color:var(--text3);font-style:normal;font-size:12px}
-    .cursor{display:inline-block;width:2px;height:14px;background:var(--accent);margin-left:2px;animation:blink .7s infinite;vertical-align:middle}
-    .conf-bar{height:6px;background:var(--border);border-radius:4px;overflow:hidden;margin:6px 0 12px}
-    .conf-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--success));border-radius:4px;width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
-    .disease-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
-    .disease-table th{background:var(--accent-bg);color:var(--accent);font-weight:600;padding:10px 14px;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
-    .disease-table td{padding:10px 14px;border-top:1px solid var(--border);color:var(--text2);vertical-align:top;line-height:1.5}
-    .disease-table tr:hover td{background:var(--surface)}
-    .severity-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
-    .sev-mild{background:#d1fae5;color:#065f46}.sev-moderate{background:#fef3c7;color:#92400e}.sev-severe{background:#fee2e2;color:#991b1b}.sev-critical{background:#7f1d1d;color:#fca5a5}
-    [data-theme="dark"] .sev-mild{background:#064e3b;color:#6ee7b7}[data-theme="dark"] .sev-moderate{background:#78350f;color:#fcd34d}[data-theme="dark"] .sev-severe{background:#7f1d1d;color:#fca5a5}
-    .footer{padding:16px 24px 20px;border-top:1px solid var(--border);flex-shrink:0}
-    .footer-inner{max-width:720px;margin:0 auto}
-    .input-wrap{position:relative;display:flex;align-items:flex-end;gap:10px}
-    .input-box{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:24px;padding:12px 18px;display:flex;flex-direction:column;gap:8px;transition:border-color var(--transition)}.input-box:focus-within{border-color:var(--accent)}
-    .tags-row{display:flex;flex-wrap:wrap;gap:6px}
-    .tag-pill{display:inline-flex;align-items:center;gap:5px;background:var(--tag-bg);color:var(--tag-text);font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;animation:popIn .2s ease}
-    .tag-pill button{color:var(--tag-text);opacity:.7;font-size:14px;line-height:1;padding:0;transition:opacity var(--transition)}.tag-pill button:hover{opacity:1}
-    .input-row{display:flex;align-items:center;gap:8px}
-    #symptom-input{flex:1;border:none;background:transparent;outline:none;font-size:14px;color:var(--text);padding:2px 0}#symptom-input::placeholder{color:var(--text3)}
-    .send-btn{width:42px;height:42px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background var(--transition),transform var(--transition);box-shadow:0 2px 8px rgba(37,99,235,.3)}.send-btn:hover{background:var(--accent-s);transform:scale(1.05)}.send-btn:disabled{background:var(--border);box-shadow:none;transform:none;cursor:not-allowed}
-    .autocomplete{position:absolute;bottom:calc(100% + 8px);left:0;right:56px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-lg);max-height:220px;overflow-y:auto;z-index:100;display:none}.autocomplete.open{display:block;animation:slideUp .15s ease}
-    .ac-item{padding:10px 16px;font-size:13.5px;color:var(--text);cursor:pointer;transition:background var(--transition);display:flex;align-items:center;gap:10px}.ac-item:hover,.ac-item.active{background:var(--accent-bg);color:var(--accent)}.ac-item span.match{font-weight:600;color:var(--accent)}.ac-other{border-top:1px solid var(--border);color:var(--text2);font-style:italic}
-    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}.modal-bg.open{display:flex;animation:fadeIn .2s ease}
-    .modal{background:var(--surface);border-radius:20px;width:100%;max-width:380px;overflow:hidden;box-shadow:var(--shadow-lg);border:1px solid var(--border);animation:slideUp .25s ease}
-    .modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}.modal-header h3{font-size:15px;font-weight:600}
-    .modal-close,.modal-back{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:background var(--transition)}.modal-close:hover,.modal-back:hover{background:var(--surface2)}
-    .modal-body{padding:8px 0 16px}
-    .setting-row{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;transition:background var(--transition)}.setting-row:hover{background:var(--surface2)}
-    .setting-label{font-size:14px;color:var(--text)}.setting-desc{font-size:12px;color:var(--text2);margin-top:1px}
-    .toggle{width:44px;height:24px;border-radius:12px;background:var(--border);position:relative;cursor:pointer;transition:background var(--transition);flex-shrink:0}.toggle.on{background:var(--accent)}
-    .toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left var(--transition);box-shadow:0 1px 3px rgba(0,0,0,.2)}.toggle.on::after{left:23px}
-    .modal-divider{height:1px;background:var(--border);margin:4px 0}
-    .setting-btn{width:100%;text-align:left;padding:12px 24px;font-size:14px;color:var(--text);display:flex;align-items:center;gap:12px;transition:background var(--transition)}.setting-btn:hover{background:var(--surface2)}.setting-btn svg{color:var(--text2)}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@keyframes popIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-    .typing-dot{display:inline-flex;gap:4px;align-items:center;padding:4px 0}.typing-dot span{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:bounce .9s infinite}.typing-dot span:nth-child(2){animation-delay:.15s}.typing-dot span:nth-child(3){animation-delay:.3s}
-    @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
-  </style>
-</head>
-<body>
-<div class="app">
-  <div class="header">
-    <div class="logo">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-      Disease Predictor
-    </div>
-    <div class="header-actions">
-      <button class="icon-btn" id="settings-btn" title="Settings">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      </button>
-    </div>
-  </div>
+    :root {
+      --bg: #f0f2f5;
+      --surface: #ffffff;
+      --surface2: #f7f8fa;
+      --border: #e8eaed;
+      --text: #1a1d23;
+      --text2: #6b7280;
+      --text3: #9ca3af;
+      --accent: #2563eb;
+      --accent-s: #1d4ed8;
+      --accent-bg: #eff6ff;
+      --tag-bg: #e0eaff;
+      --tag-text: #2563eb;
+      --danger: #ef4444;
+      --success: #10b981;
+      --shadow: 0 1px 3px rgba(0, 0, 0, .06), 0 4px 16px rgba(0, 0, 0, .06);
+      --shadow-lg: 0 8px 40px rgba(0, 0, 0, .10);
+      --r: 16px;
+      --r-sm: 10px;
+      --transition: .2s cubic-bezier(.4, 0, .2, 1)
+    }
 
-  <div class="main" id="main">
-    <div class="empty" id="empty-state">
-      <div class="empty-icon"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
-      <h2>How can I help you today?</h2>
-      <p>Describe your symptoms, and I'll predict the most possible disease.</p>
-    </div>
-  </div>
+    [data-theme="dark"] {
+      --bg: #212121;
+      --surface: #2f2f2f;
+      --surface2: #3a3a3a;
+      --border: #4a4a4a;
+      --text: #ececec;
+      --text2: #b4b4b4;
+      --text3: #6e6e6e;
+      --accent: #4f80ff;
+      --accent-s: #3b6bef;
+      --accent-bg: #1a2240;
+      --tag-bg: #2a3a60;
+      --tag-text: #7ba4ff;
+      --shadow: 0 1px 3px rgba(0, 0, 0, .4), 0 4px 16px rgba(0, 0, 0, .4);
+      --shadow-lg: 0 8px 40px rgba(0, 0, 0, .6)
+    }
 
-  <div class="footer">
-    <div class="footer-inner">
-      <div class="input-wrap">
-        <div class="autocomplete" id="autocomplete"></div>
-        <div class="input-box">
-          <div class="tags-row" id="tags-row"></div>
-          <div class="input-row">
-            <input id="symptom-input" type="text" placeholder="Type your symptoms here..." autocomplete="off"/>
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--text3);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          </div>
-        </div>
-        <button class="send-btn" id="send-btn" disabled>
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-<div class="modal-bg" id="modal-bg">
-  <div class="modal">
-    <div class="modal-header">
-      <button class="modal-back" id="modal-back" style="display:none"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <h3 id="modal-title">Settings</h3>
-      <button class="modal-close" id="modal-close"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="modal-body" id="panel-settings">
-      <div class="setting-row">
-        <div><div class="setting-label">Dark Mode</div><div class="setting-desc">Switch between light and dark theme</div></div>
-        <div class="toggle" id="dark-toggle"></div>
-      </div>
-      <div class="modal-divider"></div>
-      <button class="setting-btn" id="about-btn">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        About <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-left:auto"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-      <button class="setting-btn" id="help-btn">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Help &amp; Support <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-left:auto"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-    </div>
-    <div class="modal-body" id="panel-about" style="display:none;padding:16px 24px 24px">
-      <p style="font-size:13.5px;color:var(--text2);line-height:1.8">This tool uses a <strong style="color:var(--text)">Random Forest</strong> machine learning model trained on a dataset of 41 diseases and ~130 symptoms.</p><br>
-      <p style="font-size:12px;color:var(--text3)">Built with Python · Flask · scikit-learn · HTML/CSS/JS</p><br>
-      <p style="font-size:12px;color:var(--text3);background:var(--surface2);padding:10px 14px;border-radius:8px;border:1px solid var(--border)">⚠️ For educational purposes only. Not a substitute for professional medical advice.</p>
-    </div>
-    <div class="modal-body" id="panel-help" style="display:none;padding:16px 24px 24px">
-      <p style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">How to use</p>
-      <ul style="padding-left:16px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--text2);line-height:1.6">
-        <li>Type a symptom in the input box and select from suggestions</li>
-        <li>Add multiple symptoms for better accuracy</li>
-        <li>Press send or hit <strong style="color:var(--text)">Enter</strong> to get your prediction</li>
-      </ul><br>
-      <p style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Tips</p>
-      <ul style="padding-left:16px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--text2);line-height:1.6">
-        <li>Add at least <strong style="color:var(--text)">3–4 symptoms</strong> for best accuracy</li>
-        <li>Use "Add manually" if your symptom isn't in the list</li>
-        <li>The confidence bar shows how certain the model is</li>
-      </ul><br>
-      <p style="font-size:12px;color:var(--text3);background:var(--surface2);padding:10px 14px;border-radius:8px;border:1px solid var(--border)">⚠️ Always consult a real doctor for medical decisions.</p>
-    </div>
-  </div>
-</div>
+    html,
+    body {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background var(--transition), color var(--transition)
+    }
 
-<script>
-let allSymptoms=[],diseaseInfoData={},selectedSymptoms=[],acIndex=-1,isLoading=false;
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-family: inherit
+    }
 
-async function init(){
-  try{
-    const[s,d]=await Promise.all([fetch('/symptoms'),fetch('/disease_info')]);
-    allSymptoms=await s.json();diseaseInfoData=await d.json();
-  }catch(e){console.error('Init error',e);}
-}
-init();
+    input {
+      font-family: inherit
+    }
 
-const input=document.getElementById('symptom-input'),tagsRow=document.getElementById('tags-row'),ac=document.getElementById('autocomplete'),sendBtn=document.getElementById('send-btn'),mainEl=document.getElementById('main'),emptyState=document.getElementById('empty-state');
+    body {
+      display: flex;
+      min-height: 100vh;
+      padding: 0;
+      margin: 0
+    }
 
-input.addEventListener('input',()=>{
-  const q=input.value.trim().toLowerCase();
-  if(!q){closeAc();return;}
-  const matches=allSymptoms.filter(s=>s.toLowerCase().includes(q)&&!selectedSymptoms.includes(s)).slice(0,8);
-  if(!matches.length&&q.length<3){closeAc();return;}
-  let html=matches.map((s,i)=>{const hi=s.replace(new RegExp(`(${q})`,'gi'),'<span class="match">$1</span>');return`<div class="ac-item" data-val="${s}">${hi}</div>`;}).join('');
-  html+=`<div class="ac-item ac-other" data-val="__other__">+ Add "${input.value.trim()}" manually</div>`;
-  ac.innerHTML=html;ac.classList.add('open');acIndex=-1;
-  ac.querySelectorAll('.ac-item').forEach(el=>el.addEventListener('mousedown',e=>{e.preventDefault();selectSymptom(el.dataset.val==='__other__'?input.value.trim():el.dataset.val);}));
-});
+    .app {
+      width: 100%;
+      height: 100vh;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: background var(--transition)
+    }
 
-input.addEventListener('keydown',e=>{
-  const items=ac.querySelectorAll('.ac-item');
-  if(e.key==='ArrowDown'){e.preventDefault();acIndex=Math.min(acIndex+1,items.length-1);highlightAc(items);}
-  else if(e.key==='ArrowUp'){e.preventDefault();acIndex=Math.max(acIndex-1,0);highlightAc(items);}
-  else if(e.key==='Enter'){e.preventDefault();if(acIndex>=0&&items[acIndex]){const v=items[acIndex].dataset.val;selectSymptom(v==='__other__'?input.value.trim():v);}else if(input.value.trim()){selectSymptom(input.value.trim());}else{handleSend();}}
-  else if(e.key==='Escape')closeAc();
-});
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0
+    }
 
-function highlightAc(items){items.forEach((el,i)=>el.classList.toggle('active',i===acIndex));if(items[acIndex])items[acIndex].scrollIntoView({block:'nearest'});}
-document.addEventListener('click',e=>{if(!ac.contains(e.target)&&e.target!==input)closeAc();});
-function closeAc(){ac.classList.remove('open');ac.innerHTML='';acIndex=-1;}
-function selectSymptom(val){if(!val||selectedSymptoms.includes(val)){closeAc();input.value='';return;}selectedSymptoms.push(val);renderTags();input.value='';closeAc();input.focus();updateSendBtn();}
-function removeSymptom(val){selectedSymptoms=selectedSymptoms.filter(s=>s!==val);renderTags();updateSendBtn();}
-function renderTags(){tagsRow.innerHTML=selectedSymptoms.map(s=>`<span class="tag-pill">${s}<button onclick="removeSymptom('${s}')">×</button></span>`).join('');tagsRow.style.display=selectedSymptoms.length?'flex':'none';}
-function updateSendBtn(){sendBtn.disabled=selectedSymptoms.length===0||isLoading;}
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text)
+    }
 
-sendBtn.addEventListener('click',handleSend);
+    .logo svg {
+      color: var(--accent)
+    }
 
-async function handleSend(){
-  if(!selectedSymptoms.length||isLoading)return;
-  isLoading=true;updateSendBtn();
-  emptyState.style.display='none';
+    .header-actions {
+      display: flex;
+      gap: 8px
+    }
 
-  const userBubble=document.createElement('div');
-  userBubble.className='msg msg-user';
-  userBubble.innerHTML=`<div class="bubble">${selectedSymptoms.map(s=>`<span class="tag-pill">${s}</span>`).join(' ')}</div>`;
-  mainEl.appendChild(userBubble);
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text2);
+      transition: background var(--transition), color var(--transition)
+    }
 
-  const typingEl=document.createElement('div');
-  typingEl.className='msg msg-ai';
-  typingEl.innerHTML=`<div class="ai-avatar"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="bubble-ai"><div class="typing-dot"><span></span><span></span><span></span></div></div>`;
-  mainEl.appendChild(typingEl);scrollBottom();
+    .icon-btn:hover {
+      background: var(--surface2);
+      color: var(--text)
+    }
 
-  const payload={symptoms:[...selectedSymptoms]};
-  selectedSymptoms=[];renderTags();updateSendBtn();
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 28px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      scroll-behavior: smooth
+    }
 
-  try{
-    const res=await fetch('/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    const aiBubble=document.createElement('div');aiBubble.className='msg msg-ai';
-    const aiContent=document.createElement('div');aiContent.className='bubble-ai';aiContent.innerHTML='<span class="cursor"></span>';
-    aiBubble.innerHTML=`<div class="ai-avatar"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>`;
-    aiBubble.appendChild(aiContent);typingEl.replaceWith(aiBubble);
+    .main::-webkit-scrollbar {
+      width: 4px
+    }
 
-    if(!res.ok){const err=await res.json();aiBubble.remove();appendError(err.error||'Invalid input.');isLoading=false;updateSendBtn();return;}
+    .main::-webkit-scrollbar-track {
+      background: transparent
+    }
 
-    const reader=res.body.getReader(),decoder=new TextDecoder();
-    let rawText='',buffer='';
-    while(true){
-      const{done,value}=await reader.read();if(done)break;
-      buffer+=decoder.decode(value,{stream:true});
-      const lines=buffer.split('\n');buffer=lines.pop();
-      for(const line of lines){
-        if(!line.startsWith('data: '))continue;const chunk=line.slice(6);if(chunk==='[DONE]')break;
-        try{rawText+=JSON.parse(chunk);}catch{}
-        aiContent.innerHTML=renderMarkdown(rawText)+'<span class="cursor"></span>';
-        animateConfBar(aiContent,rawText);scrollBottom();
+    .main::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px
+    }
+
+    .empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      animation: fadeIn .5s ease
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text3)
+    }
+
+    .empty h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--text)
+    }
+
+    .empty p {
+      font-size: 14px;
+      color: var(--text2);
+      text-align: center;
+      max-width: 280px;
+      line-height: 1.6
+    }
+
+    .msg {
+      animation: slideUp .3s ease
+    }
+
+    .msg-user {
+      display: flex;
+      justify-content: flex-end
+    }
+
+    .msg-user .bubble {
+      background: var(--accent);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 18px 18px 4px 18px;
+      max-width: 75%;
+      font-size: 14px;
+      line-height: 1.6
+    }
+
+    .msg-user .bubble .tag-pill {
+      background: rgba(255, 255, 255, .2);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .3)
+    }
+
+    .msg-ai {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start
+    }
+
+    .ai-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-bg);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--accent)
+    }
+
+    .bubble-ai {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      border-radius: 4px 18px 18px 18px;
+      max-width: 80%;
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text)
+    }
+
+    .bubble-ai h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 8px;
+      margin-top: 4px
+    }
+
+    .bubble-ai h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin: 14px 0 6px
+    }
+
+    .bubble-ai strong {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    .bubble-ai ul {
+      padding-left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px
+    }
+
+    .bubble-ai li {
+      color: var(--text2)
+    }
+
+    .bubble-ai hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 12px 0
+    }
+
+    .bubble-ai em {
+      color: var(--text3);
+      font-style: normal;
+      font-size: 12px
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 14px;
+      background: var(--accent);
+      margin-left: 2px;
+      animation: blink .7s infinite;
+      vertical-align: middle
+    }
+
+    .conf-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 6px 0 12px
+    }
+
+    .conf-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--success));
+      border-radius: 4px;
+      width: 0%;
+      transition: width 1.2s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .disease-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 13px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border)
+    }
+
+    .disease-table th {
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-weight: 600;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .5px
+    }
+
+    .disease-table td {
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+      color: var(--text2);
+      vertical-align: top;
+      line-height: 1.5
+    }
+
+    .disease-table tr:hover td {
+      background: var(--surface)
+    }
+
+    .severity-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600
+    }
+
+    .sev-mild {
+      background: #d1fae5;
+      color: #065f46
+    }
+
+    .sev-moderate {
+      background: #fef3c7;
+      color: #92400e
+    }
+
+    .sev-severe {
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    .sev-critical {
+      background: #7f1d1d;
+      color: #fca5a5
+    }
+
+    [data-theme="dark"] .sev-mild {
+      background: #064e3b;
+      color: #6ee7b7
+    }
+
+    [data-theme="dark"] .sev-moderate {
+      background: #78350f;
+      color: #fcd34d
+    }
+
+    [data-theme="dark"] .sev-severe {
+      background: #7f1d1d;
+      color: #fca5a5
+    }
+
+    /* ── Export PDF button ───────────────────────────────────────────────── */
+    .export-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: background var(--transition), transform var(--transition);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, .25)
+    }
+
+    .export-btn:hover {
+      background: var(--accent-s);
+      transform: translateY(-1px)
+    }
+
+    .export-btn svg {
+      flex-shrink: 0
+    }
+
+    .footer {
+      padding: 16px 24px 20px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0
+    }
+
+    .footer-inner {
+      max-width: 720px;
+      margin: 0 auto
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      gap: 10px
+    }
+
+    .input-box {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 12px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color var(--transition)
+    }
+
+    .input-box:focus-within {
+      border-color: var(--accent)
+    }
+
+    .tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px
+    }
+
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      animation: popIn .2s ease
+    }
+
+    .tag-pill button {
+      color: var(--tag-text);
+      opacity: .7;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0;
+      transition: opacity var(--transition)
+    }
+
+    .tag-pill button:hover {
+      opacity: 1
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    #symptom-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 14px;
+      color: var(--text);
+      padding: 2px 0
+    }
+
+    #symptom-input::placeholder {
+      color: var(--text3)
+    }
+
+    .send-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background var(--transition), transform var(--transition);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, .3)
+    }
+
+    .send-btn:hover {
+      background: var(--accent-s);
+      transform: scale(1.05)
+    }
+
+    .send-btn:disabled {
+      background: var(--border);
+      box-shadow: none;
+      transform: none;
+      cursor: not-allowed
+    }
+
+    .autocomplete {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 0;
+      right: 56px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-lg);
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none
+    }
+
+    .autocomplete.open {
+      display: block;
+      animation: slideUp .15s ease
+    }
+
+    .ac-item {
+      padding: 10px 16px;
+      font-size: 13.5px;
+      color: var(--text);
+      cursor: pointer;
+      transition: background var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .ac-item:hover,
+    .ac-item.active {
+      background: var(--accent-bg);
+      color: var(--accent)
+    }
+
+    .ac-item span.match {
+      font-weight: 600;
+      color: var(--accent)
+    }
+
+    .ac-other {
+      border-top: 1px solid var(--border);
+      color: var(--text2);
+      font-style: italic
+    }
+
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .4);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px)
+    }
+
+    .modal-bg.open {
+      display: flex;
+      animation: fadeIn .2s ease
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 380px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      animation: slideUp .25s ease
+    }
+
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .modal-header h3 {
+      font-size: 15px;
+      font-weight: 600
+    }
+
+    .modal-close,
+    .modal-back {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text2);
+      transition: background var(--transition)
+    }
+
+    .modal-close:hover,
+    .modal-back:hover {
+      background: var(--surface2)
+    }
+
+    .modal-body {
+      padding: 8px 0 16px
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      transition: background var(--transition)
+    }
+
+    .setting-row:hover {
+      background: var(--surface2)
+    }
+
+    .setting-label {
+      font-size: 14px;
+      color: var(--text)
+    }
+
+    .setting-desc {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 1px
+    }
+
+    .toggle {
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--border);
+      position: relative;
+      cursor: pointer;
+      transition: background var(--transition);
+      flex-shrink: 0
+    }
+
+    .toggle.on {
+      background: var(--accent)
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      top: 3px;
+      left: 3px;
+      transition: left var(--transition);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .2)
+    }
+
+    .toggle.on::after {
+      left: 23px
+    }
+
+    .modal-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0
+    }
+
+    .setting-btn {
+      width: 100%;
+      text-align: left;
+      padding: 12px 24px;
+      font-size: 14px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background var(--transition)
+    }
+
+    .setting-btn:hover {
+      background: var(--surface2)
+    }
+
+    .setting-btn svg {
+      color: var(--text2)
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
       }
     }
 
-    const diseaseMatch=rawText.match(/## Predicted Condition\n\*\*(.+?)\*\*/);
-    aiContent.innerHTML=renderMarkdown(rawText);
-    animateConfBar(aiContent,rawText);
-    if(diseaseMatch){const t=buildDiseaseTable(diseaseMatch[1].trim());if(t)aiContent.appendChild(t);}
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
 
-  }catch(err){typingEl.remove();appendError('Could not reach the server. Make sure Flask is running.');}
-  isLoading=false;updateSendBtn();scrollBottom();
-}
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
 
-function buildDiseaseTable(name){
-  const info=diseaseInfoData[name];if(!info)return null;
-  const sev=(info.severity||'').toLowerCase();
-  let sc='sev-mild';
-  if(sev.includes('critical'))sc='sev-critical';
-  else if(sev.includes('severe'))sc='sev-severe';
-  else if(sev.includes('moderate'))sc='sev-moderate';
-  const w=document.createElement('div');w.style.marginTop='16px';
-  w.innerHTML=`<h3 style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Disease Summary</h3>
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(.8)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0
+      }
+    }
+
+    .typing-dot {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      padding: 4px 0
+    }
+
+    .typing-dot span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text3);
+      animation: bounce .9s infinite
+    }
+
+    .typing-dot span:nth-child(2) {
+      animation-delay: .15s
+    }
+
+    .typing-dot span:nth-child(3) {
+      animation-delay: .3s
+    }
+
+    @keyframes bounce {
+
+      0%,
+      80%,
+      100% {
+        transform: translateY(0)
+      }
+
+      40% {
+        transform: translateY(-6px)
+      }
+    }
+
+    /* ── Print / PDF styles ──────────────────────────────────────────────── */
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important
+      }
+
+      body {
+        background: #fff !important;
+        color: #000 !important;
+        font-family: 'DM Sans', sans-serif
+      }
+
+      .app,
+      .main,
+      .header,
+      .footer,
+      .msg-user,
+      .autocomplete,
+      .send-btn,
+      .export-btn,
+      .modal-bg {
+        display: none !important
+      }
+
+      #pdf-report {
+        display: block !important
+      }
+
+      #pdf-report * {
+        color: #000 !important;
+        background: transparent !important
+      }
+
+      .pdf-header {
+        border-bottom: 2px solid #2563eb;
+        padding-bottom: 16px;
+        margin-bottom: 24px
+      }
+
+      .pdf-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2563eb !important;
+        margin-bottom: 4px
+      }
+
+      .pdf-subtitle {
+        font-size: 12px;
+        color: #6b7280 !important
+      }
+
+      .pdf-section {
+        margin-bottom: 20px
+      }
+
+      .pdf-section-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        color: #2563eb !important;
+        border-bottom: 1px solid #e8eaed;
+        padding-bottom: 6px;
+        margin-bottom: 12px
+      }
+
+      .pdf-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px
+      }
+
+      .pdf-table th {
+        background: #eff6ff !important;
+        color: #2563eb !important;
+        font-weight: 600;
+        padding: 8px 12px;
+        text-align: left;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        border: 1px solid #e8eaed
+      }
+
+      .pdf-table td {
+        padding: 8px 12px;
+        border: 1px solid #e8eaed;
+        vertical-align: top;
+        line-height: 1.5;
+        color: #374151 !important
+      }
+
+      .pdf-table tr:nth-child(even) td {
+        background: #f9fafb !important
+      }
+
+      .pdf-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700
+      }
+
+      .pdf-badge-mild {
+        background: #d1fae5 !important;
+        color: #065f46 !important
+      }
+
+      .pdf-badge-moderate {
+        background: #fef3c7 !important;
+        color: #92400e !important
+      }
+
+      .pdf-badge-severe {
+        background: #fee2e2 !important;
+        color: #991b1b !important
+      }
+
+      .pdf-badge-critical {
+        background: #fca5a5 !important;
+        color: #7f1d1d !important
+      }
+
+      .pdf-disclaimer {
+        margin-top: 32px;
+        padding: 12px 16px;
+        border: 1px solid #fde68a;
+        border-radius: 8px;
+        background: #fffbeb !important;
+        font-size: 11px;
+        color: #92400e !important;
+        line-height: 1.6
+      }
+
+      .pdf-footer {
+        margin-top: 40px;
+        border-top: 1px solid #e8eaed;
+        padding-top: 12px;
+        font-size: 10px;
+        color: #9ca3af !important;
+        display: flex;
+        justify-content: space-between
+      }
+
+      .pdf-symptoms {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 4px
+      }
+
+      .pdf-symptom-tag {
+        background: #eff6ff !important;
+        color: #2563eb !important;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid #bfdbfe
+      }
+
+      .pdf-conf-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 4px
+      }
+
+      .pdf-conf-bar-bg {
+        flex: 1;
+        height: 8px;
+        background: #e8eaed !important;
+        border-radius: 4px;
+        overflow: hidden
+      }
+
+      .pdf-conf-bar-fill {
+        height: 100%;
+        background: #2563eb !important;
+        border-radius: 4px
+      }
+
+      .pdf-conf-label {
+        font-size: 16px;
+        font-weight: 700;
+        color: #2563eb !important;
+        min-width: 52px;
+        text-align: right
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── Hidden PDF report (only shown during print) ────────────────────── -->
+  <div id="pdf-report" style="display:none;padding:32px;max-width:800px;margin:0 auto;font-family:'DM Sans',sans-serif">
+
+    <div class="pdf-header">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="pdf-title">Disease Predictor — Medical Report</div>
+          <div class="pdf-subtitle" id="pdf-date">Generated on —</div>
+        </div>
+        <div style="text-align:right;font-size:11px;color:#6b7280">
+          <div style="font-weight:600;color:#2563eb;font-size:14px">AI-Assisted Diagnosis</div>
+          <div>For educational purposes only</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pdf-section">
+      <div class="pdf-section-title">Symptoms Reported</div>
+      <div class="pdf-symptoms" id="pdf-symptoms"></div>
+    </div>
+
+    <div class="pdf-section">
+      <div class="pdf-section-title">Primary Prediction</div>
+      <table class="pdf-table">
+        <tbody>
+          <tr>
+            <td style="width:160px;font-weight:600">Predicted Condition</td>
+            <td id="pdf-disease" style="font-size:15px;font-weight:700;color:#1a1d23"></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Confidence Score</td>
+            <td>
+              <div class="pdf-conf-row">
+                <div class="pdf-conf-bar-bg">
+                  <div class="pdf-conf-bar-fill" id="pdf-conf-fill" style="width:0%"></div>
+                </div>
+                <div class="pdf-conf-label" id="pdf-conf-label">—</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Severity</td>
+            <td id="pdf-severity">—</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Recommended Specialist</td>
+            <td id="pdf-specialist">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pdf-section">
+      <div class="pdf-section-title">About This Condition</div>
+      <p id="pdf-description" style="font-size:13px;line-height:1.8;color:#374151"></p>
+    </div>
+
+    <div class="pdf-section">
+      <div class="pdf-section-title">Other Possibilities</div>
+      <table class="pdf-table">
+        <thead>
+          <tr>
+            <th>Condition</th>
+            <th>Confidence</th>
+          </tr>
+        </thead>
+        <tbody id="pdf-others"></tbody>
+      </table>
+    </div>
+
+    <div class="pdf-disclaimer">
+      ⚠️ <strong>Important Disclaimer:</strong> This report is generated by an AI-based educational tool and is
+      <strong>not a substitute for professional medical advice, diagnosis, or treatment.</strong> The predictions are
+      based on symptom patterns and may not be accurate. Always consult a qualified healthcare professional for proper
+      medical evaluation and treatment.
+    </div>
+
+    <div class="pdf-footer">
+      <span>Disease Predictor — AI Symptom Analysis Tool</span>
+      <span id="pdf-footer-date"></span>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="header">
+      <div class="logo">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+        </svg>
+        Disease Predictor
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="settings-btn" title="Settings">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="main" id="main">
+      <div class="empty" id="empty-state">
+        <div class="empty-icon"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"
+            viewBox="0 0 24 24">
+            <path d="M12 5v14M5 12h14" />
+          </svg></div>
+        <h2>How can I help you today?</h2>
+        <p>Describe your symptoms, and I'll predict the most possible disease.</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-inner">
+        <div class="input-wrap">
+          <div class="autocomplete" id="autocomplete"></div>
+          <div class="input-box">
+            <div class="tags-row" id="tags-row"></div>
+            <div class="input-row">
+              <input id="symptom-input" type="text" placeholder="Type your symptoms here..." autocomplete="off" />
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                style="color:var(--text3);flex-shrink:0">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </div>
+          </div>
+          <button class="send-btn" id="send-btn" disabled>
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="modal-bg">
+    <div class="modal">
+      <div class="modal-header">
+        <button class="modal-back" id="modal-back" style="display:none"><svg width="16" height="16" fill="none"
+            stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="15 18 9 12 15 6" />
+          </svg></button>
+        <h3 id="modal-title">Settings</h3>
+        <button class="modal-close" id="modal-close"><svg width="16" height="16" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg></button>
+      </div>
+      <div class="modal-body" id="panel-settings">
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Dark Mode</div>
+            <div class="setting-desc">Switch between light and dark theme</div>
+          </div>
+          <div class="toggle" id="dark-toggle"></div>
+        </div>
+        <div class="modal-divider"></div>
+        <button class="setting-btn" id="about-btn">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          About <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            style="margin-left:auto">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+        <button class="setting-btn" id="help-btn">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          Help &amp; Support <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24" style="margin-left:auto">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="panel-about" style="display:none;padding:16px 24px 24px">
+        <p style="font-size:13.5px;color:var(--text2);line-height:1.8">This tool uses a <strong
+            style="color:var(--text)">Random Forest</strong> machine learning model trained on a dataset of 41 diseases
+          and ~130 symptoms.</p><br>
+        <p style="font-size:12px;color:var(--text3)">Built with Python · Flask · scikit-learn · HTML/CSS/JS</p><br>
+        <p
+          style="font-size:12px;color:var(--text3);background:var(--surface2);padding:10px 14px;border-radius:8px;border:1px solid var(--border)">
+          For educational purposes only. Not a substitute for professional medical advice.</p>
+      </div>
+      <div class="modal-body" id="panel-help" style="display:none;padding:16px 24px 24px">
+        <p
+          style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">
+          How to use</p>
+        <ul
+          style="padding-left:16px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--text2);line-height:1.6">
+          <li>Type a symptom in the input box and select from suggestions</li>
+          <li>Add multiple symptoms for better accuracy</li>
+          <li>Press send or hit <strong style="color:var(--text)">Enter</strong> to get your prediction</li>
+        </ul><br>
+        <p
+          style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">
+          Tips</p>
+        <ul
+          style="padding-left:16px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--text2);line-height:1.6">
+          <li>Add at least <strong style="color:var(--text)">3–4 symptoms</strong> for best accuracy</li>
+          <li>Use "Add manually" if your symptom isn't in the list</li>
+          <li>The confidence bar shows how certain the model is</li>
+        </ul><br>
+        <p
+          style="font-size:12px;color:var(--text3);background:var(--surface2);padding:10px 14px;border-radius:8px;border:1px solid var(--border)">
+          Always consult a real doctor for medical decisions.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allSymptoms = [], diseaseInfoData = {}, selectedSymptoms = [], acIndex = -1, isLoading = false;
+    let lastReport = { symptoms: [], disease: '', confidence: '', severity: '', specialist: '', description: '', others: [] };
+
+    async function init() {
+      try {
+        const [s, d] = await Promise.all([fetch('/symptoms'), fetch('/disease_info')]);
+        allSymptoms = await s.json(); diseaseInfoData = await d.json();
+      } catch (e) { console.error('Init error', e); }
+    }
+    init();
+
+    const input = document.getElementById('symptom-input'), tagsRow = document.getElementById('tags-row'), ac = document.getElementById('autocomplete'), sendBtn = document.getElementById('send-btn'), mainEl = document.getElementById('main'), emptyState = document.getElementById('empty-state');
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      if (!q) { closeAc(); return; }
+      const matches = allSymptoms.filter(s => s.toLowerCase().includes(q) && !selectedSymptoms.includes(s)).slice(0, 8);
+      if (!matches.length && q.length < 3) { closeAc(); return; }
+      let html = matches.map((s, i) => { const hi = s.replace(new RegExp(`(${q})`, 'gi'), '<span class="match">$1</span>'); return `<div class="ac-item" data-val="${s}">${hi}</div>`; }).join('');
+      html += `<div class="ac-item ac-other" data-val="__other__">+ Add "${input.value.trim()}" manually</div>`;
+      ac.innerHTML = html; ac.classList.add('open'); acIndex = -1;
+      ac.querySelectorAll('.ac-item').forEach(el => el.addEventListener('mousedown', e => { e.preventDefault(); selectSymptom(el.dataset.val === '__other__' ? input.value.trim() : el.dataset.val); }));
+    });
+
+    input.addEventListener('keydown', e => {
+      const items = ac.querySelectorAll('.ac-item');
+      if (e.key === 'ArrowDown') { e.preventDefault(); acIndex = Math.min(acIndex + 1, items.length - 1); highlightAc(items); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); acIndex = Math.max(acIndex - 1, 0); highlightAc(items); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (acIndex >= 0 && items[acIndex]) { const v = items[acIndex].dataset.val; selectSymptom(v === '__other__' ? input.value.trim() : v); } else if (input.value.trim()) { selectSymptom(input.value.trim()); } else { handleSend(); } }
+      else if (e.key === 'Escape') closeAc();
+    });
+
+    function highlightAc(items) { items.forEach((el, i) => el.classList.toggle('active', i === acIndex)); if (items[acIndex]) items[acIndex].scrollIntoView({ block: 'nearest' }); }
+    document.addEventListener('click', e => { if (!ac.contains(e.target) && e.target !== input) closeAc(); });
+    function closeAc() { ac.classList.remove('open'); ac.innerHTML = ''; acIndex = -1; }
+    function selectSymptom(val) { if (!val || selectedSymptoms.includes(val)) { closeAc(); input.value = ''; return; } selectedSymptoms.push(val); renderTags(); input.value = ''; closeAc(); input.focus(); updateSendBtn(); }
+    function removeSymptom(val) { selectedSymptoms = selectedSymptoms.filter(s => s !== val); renderTags(); updateSendBtn(); }
+    function renderTags() { tagsRow.innerHTML = selectedSymptoms.map(s => `<span class="tag-pill">${s}<button onclick="removeSymptom('${s}')">×</button></span>`).join(''); tagsRow.style.display = selectedSymptoms.length ? 'flex' : 'none'; }
+    function updateSendBtn() { sendBtn.disabled = selectedSymptoms.length === 0 || isLoading; }
+
+    sendBtn.addEventListener('click', handleSend);
+
+    async function handleSend() {
+      if (!selectedSymptoms.length || isLoading) return;
+      isLoading = true; updateSendBtn();
+      emptyState.style.display = 'none';
+
+      const symptomsForReport = [...selectedSymptoms];
+
+      const userBubble = document.createElement('div');
+      userBubble.className = 'msg msg-user';
+      userBubble.innerHTML = `<div class="bubble">${selectedSymptoms.map(s => `<span class="tag-pill">${s}</span>`).join(' ')}</div>`;
+      mainEl.appendChild(userBubble);
+
+      const typingEl = document.createElement('div');
+      typingEl.className = 'msg msg-ai';
+      typingEl.innerHTML = `<div class="ai-avatar"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="bubble-ai"><div class="typing-dot"><span></span><span></span><span></span></div></div>`;
+      mainEl.appendChild(typingEl); scrollBottom();
+
+      const payload = { symptoms: [...selectedSymptoms] };
+      selectedSymptoms = []; renderTags(); updateSendBtn();
+
+      try {
+        const res = await fetch('/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const aiBubble = document.createElement('div'); aiBubble.className = 'msg msg-ai';
+        const aiContent = document.createElement('div'); aiContent.className = 'bubble-ai'; aiContent.innerHTML = '<span class="cursor"></span>';
+        aiBubble.innerHTML = `<div class="ai-avatar"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>`;
+        aiBubble.appendChild(aiContent); typingEl.replaceWith(aiBubble);
+
+        if (!res.ok) { const err = await res.json(); aiBubble.remove(); appendError(err.error || 'Invalid input.'); isLoading = false; updateSendBtn(); return; }
+
+        const reader = res.body.getReader(), decoder = new TextDecoder();
+        let rawText = '', buffer = '';
+        while (true) {
+          const { done, value } = await reader.read(); if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n'); buffer = lines.pop();
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue; const chunk = line.slice(6); if (chunk === '[DONE]') break;
+            try { rawText += JSON.parse(chunk); } catch { }
+            aiContent.innerHTML = renderMarkdown(rawText) + '<span class="cursor"></span>';
+            animateConfBar(aiContent, rawText); scrollBottom();
+          }
+        }
+
+        // Parse results for report
+        const diseaseMatch = rawText.match(/## Predicted Condition\n\*\*(.+?)\*\*/);
+        const confMatch = rawText.match(/Confidence Score\n([\d.]+)%/);
+        const sevMatch = rawText.match(/Severity\n(.+?)\n/);
+        const specMatch = rawText.match(/Recommended Specialist\n(.+?)\n/);
+        const descMatch = rawText.match(/About This Condition\n(.+?)(?=\n###|\n---)/s);
+        const othersMatch = [...rawText.matchAll(/- \*\*(.+?)\*\* — ([\d.]+)%/g)];
+
+        const diseaseName = diseaseMatch ? diseaseMatch[1].trim() : '';
+        const info = diseaseInfoData[diseaseName] || {};
+
+        // Store for PDF
+        lastReport = {
+          symptoms: symptomsForReport,
+          disease: diseaseName,
+          confidence: confMatch ? confMatch[1] : '—',
+          severity: sevMatch ? sevMatch[1].trim() : (info.severity || '—'),
+          specialist: specMatch ? specMatch[1].trim() : (info.specialist || '—'),
+          description: descMatch ? descMatch[1].trim().replace(/<[^>]*>/g, '') : (info.desc || '—'),
+          others: othersMatch.map(m => ({ name: m[1], conf: m[2] }))
+        };
+
+        aiContent.innerHTML = renderMarkdown(rawText);
+        animateConfBar(aiContent, rawText);
+
+        // Build disease table
+        if (diseaseName) { const t = buildDiseaseTable(diseaseName); if (t) aiContent.appendChild(t); }
+
+        // Add Export PDF button
+        const exportBtn = document.createElement('button');
+        exportBtn.className = 'export-btn';
+        exportBtn.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export PDF Report`;
+        exportBtn.addEventListener('click', exportToPDF);
+        aiContent.appendChild(exportBtn);
+
+      } catch (err) { typingEl.remove(); appendError('Could not reach the server. Make sure Flask is running.'); }
+      isLoading = false; updateSendBtn(); scrollBottom();
+    }
+
+    // ── Export to PDF ──────────────────────────────────────────────────────────
+    function exportToPDF() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      const fullDate = `${dateStr} at ${timeStr}`;
+
+      // Fill in date
+      document.getElementById('pdf-date').textContent = 'Generated on ' + fullDate;
+      document.getElementById('pdf-footer-date').textContent = fullDate;
+
+      // Fill symptoms
+      document.getElementById('pdf-symptoms').innerHTML =
+        lastReport.symptoms.map(s => `<span class="pdf-symptom-tag">${s}</span>`).join('');
+
+      // Fill disease
+      document.getElementById('pdf-disease').textContent = lastReport.disease;
+
+      // Fill confidence bar
+      const conf = parseFloat(lastReport.confidence) || 0;
+      document.getElementById('pdf-conf-fill').style.width = conf + '%';
+      document.getElementById('pdf-conf-label').textContent = conf.toFixed(1) + '%';
+
+      // Fill severity with badge
+      const sev = (lastReport.severity || '').toLowerCase();
+      let badgeClass = 'pdf-badge-mild';
+      if (sev.includes('critical')) badgeClass = 'pdf-badge-critical';
+      else if (sev.includes('severe')) badgeClass = 'pdf-badge-severe';
+      else if (sev.includes('moderate')) badgeClass = 'pdf-badge-moderate';
+      document.getElementById('pdf-severity').innerHTML =
+        `<span class="pdf-badge ${badgeClass}">${lastReport.severity}</span>`;
+
+      // Fill specialist & description
+      document.getElementById('pdf-specialist').textContent = lastReport.specialist;
+      document.getElementById('pdf-description').textContent = lastReport.description;
+
+      // Fill other possibilities
+      document.getElementById('pdf-others').innerHTML = lastReport.others.length
+        ? lastReport.others.map(o => `<tr><td>${o.name}</td><td style="font-weight:600;color:#2563eb">${o.conf}%</td></tr>`).join('')
+        : '<tr><td colspan="2" style="color:#9ca3af;font-style:italic">No alternatives recorded</td></tr>';
+
+      // Trigger print
+      window.print();
+    }
+
+    function buildDiseaseTable(name) {
+      const info = diseaseInfoData[name]; if (!info) return null;
+      const sev = (info.severity || '').toLowerCase();
+      let sc = 'sev-mild';
+      if (sev.includes('critical')) sc = 'sev-critical';
+      else if (sev.includes('severe')) sc = 'sev-severe';
+      else if (sev.includes('moderate')) sc = 'sev-moderate';
+      const w = document.createElement('div'); w.style.marginTop = '16px';
+      w.innerHTML = `<h3 style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Disease Summary</h3>
   <table class="disease-table"><thead><tr><th>Field</th><th>Details</th></tr></thead><tbody>
   <tr><td><strong>Condition</strong></td><td>${name}</td></tr>
-  <tr><td><strong>Severity</strong></td><td><span class="severity-badge ${sc}">${info.severity||'Unknown'}</span></td></tr>
-  <tr><td><strong>Specialist</strong></td><td>${info.specialist||'General Physician'}</td></tr>
-  <tr><td><strong>Description</strong></td><td>${info.desc||'—'}</td></tr>
+  <tr><td><strong>Severity</strong></td><td><span class="severity-badge ${sc}">${info.severity || 'Unknown'}</span></td></tr>
+  <tr><td><strong>Specialist</strong></td><td>${info.specialist || 'General Physician'}</td></tr>
+  <tr><td><strong>Description</strong></td><td>${info.desc || '—'}</td></tr>
   </tbody></table>`;
-  return w;
-}
+      return w;
+    }
 
-function renderMarkdown(text){
-  return text.replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/^- (.+)$/gm,'<li>$1</li>').replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>').replace(/---/g,'<hr>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/\n{2,}/g,'<br><br>').replace(/\n/g,'<br>');
-}
+    function renderMarkdown(text) {
+      return text.replace(/^## (.+)$/gm, '<h2>$1</h2>').replace(/^### (.+)$/gm, '<h3>$1</h3>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/^- (.+)$/gm, '<li>$1</li>').replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>').replace(/---/g, '<hr>').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/\n{2,}/g, '<br><br>').replace(/\n/g, '<br>');
+    }
 
-function animateConfBar(container,text){
-  const match=text.match(/Confidence Score\n([\d.]+)%/);if(!match)return;
-  let bar=container.querySelector('.conf-bar');
-  if(!bar){bar=document.createElement('div');bar.className='conf-bar';bar.innerHTML='<div class="conf-fill"></div>';const h3=[...container.querySelectorAll('h3')].find(el=>el.textContent.includes('Confidence'));if(h3)h3.after(bar);}
-  const fill=bar.querySelector('.conf-fill');if(fill)setTimeout(()=>fill.style.width=match[1]+'%',100);
-}
+    function animateConfBar(container, text) {
+      const match = text.match(/Confidence Score\n([\d.]+)%/); if (!match) return;
+      let bar = container.querySelector('.conf-bar');
+      if (!bar) { bar = document.createElement('div'); bar.className = 'conf-bar'; bar.innerHTML = '<div class="conf-fill"></div>'; const h3 = [...container.querySelectorAll('h3')].find(el => el.textContent.includes('Confidence')); if (h3) h3.after(bar); }
+      const fill = bar.querySelector('.conf-fill'); if (fill) setTimeout(() => fill.style.width = match[1] + '%', 100);
+    }
 
-function appendError(msg){
-  const el=document.createElement('div');el.className='msg msg-ai';
-  el.innerHTML=`<div class="ai-avatar" style="background:#fee2e2;color:#ef4444"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="bubble-ai" style="color:var(--danger)">${msg}</div>`;
-  mainEl.appendChild(el);
-}
+    function appendError(msg) {
+      const el = document.createElement('div'); el.className = 'msg msg-ai';
+      el.innerHTML = `<div class="ai-avatar" style="background:#fee2e2;color:#ef4444"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="bubble-ai" style="color:var(--danger)">${msg}</div>`;
+      mainEl.appendChild(el);
+    }
 
-function scrollBottom(){mainEl.scrollTo({top:mainEl.scrollHeight,behavior:'smooth'});}
+    function scrollBottom() { mainEl.scrollTo({ top: mainEl.scrollHeight, behavior: 'smooth' }); }
 
-const modalBg=document.getElementById('modal-bg'),darkToggle=document.getElementById('dark-toggle'),modalTitle=document.getElementById('modal-title'),modalBack=document.getElementById('modal-back'),panelSettings=document.getElementById('panel-settings'),panelAbout=document.getElementById('panel-about'),panelHelp=document.getElementById('panel-help');
+    const modalBg = document.getElementById('modal-bg'), darkToggle = document.getElementById('dark-toggle'), modalTitle = document.getElementById('modal-title'), modalBack = document.getElementById('modal-back'), panelSettings = document.getElementById('panel-settings'), panelAbout = document.getElementById('panel-about'), panelHelp = document.getElementById('panel-help');
 
-function showPanel(panel,title){panelSettings.style.display='none';panelAbout.style.display='none';panelHelp.style.display='none';panel.style.display='block';modalTitle.textContent=title;modalBack.style.display=panel===panelSettings?'none':'flex';}
+    function showPanel(panel, title) { panelSettings.style.display = 'none'; panelAbout.style.display = 'none'; panelHelp.style.display = 'none'; panel.style.display = 'block'; modalTitle.textContent = title; modalBack.style.display = panel === panelSettings ? 'none' : 'flex'; }
 
-document.getElementById('settings-btn').addEventListener('click',()=>{showPanel(panelSettings,'Settings');modalBg.classList.add('open');});
-document.getElementById('modal-close').addEventListener('click',()=>modalBg.classList.remove('open'));
-modalBg.addEventListener('click',e=>{if(e.target===modalBg)modalBg.classList.remove('open');});
-modalBack.addEventListener('click',()=>showPanel(panelSettings,'Settings'));
+    document.getElementById('settings-btn').addEventListener('click', () => { showPanel(panelSettings, 'Settings'); modalBg.classList.add('open'); });
+    document.getElementById('modal-close').addEventListener('click', () => modalBg.classList.remove('open'));
+    modalBg.addEventListener('click', e => { if (e.target === modalBg) modalBg.classList.remove('open'); });
+    modalBack.addEventListener('click', () => showPanel(panelSettings, 'Settings'));
 
-const saved=localStorage.getItem('theme');
-if(saved==='dark'){document.documentElement.setAttribute('data-theme','dark');darkToggle.classList.add('on');}
-darkToggle.addEventListener('click',()=>{const isDark=document.documentElement.getAttribute('data-theme')==='dark';document.documentElement.setAttribute('data-theme',isDark?'light':'dark');darkToggle.classList.toggle('on',!isDark);localStorage.setItem('theme',isDark?'light':'dark');});
-document.getElementById('about-btn').addEventListener('click',()=>showPanel(panelAbout,'About'));
-document.getElementById('help-btn').addEventListener('click',()=>showPanel(panelHelp,'Help & Support'));
-</script>
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); darkToggle.classList.add('on'); }
+    darkToggle.addEventListener('click', () => { const isDark = document.documentElement.getAttribute('data-theme') === 'dark'; document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark'); darkToggle.classList.toggle('on', !isDark); localStorage.setItem('theme', isDark ? 'light' : 'dark'); });
+    document.getElementById('about-btn').addEventListener('click', () => showPanel(panelAbout, 'About'));
+    document.getElementById('help-btn').addEventListener('click', () => showPanel(panelHelp, 'Help & Support'));
+  </script>
 </body>
+
 </html>
