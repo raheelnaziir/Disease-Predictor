@@ -1244,6 +1244,29 @@
     function updateSendBtn() {
       sendBtn.disabled = input.value.trim().length < 5 || isLoading;
     }
+
+    function showFileTag(name) {
+      // Remove existing tag if any
+      const existing = document.getElementById('file-tag');
+      if (existing) existing.remove();
+
+      const tag = document.createElement('div');
+      tag.id = 'file-tag';
+      tag.style.cssText = 'display:inline-flex;align-items:center;gap:6px;background:var(--tag-bg);color:var(--tag-text);font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;margin-bottom:6px';
+      tag.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${name}<button onclick="removeFileTag()" style="color:var(--tag-text);opacity:.7;font-size:14px;line-height:1;padding:0;background:none;border:none;cursor:pointer">×</button>`;
+
+      // Insert above the textarea inside input-box
+      const inputBox = document.querySelector('.input-box');
+      inputBox.insertBefore(tag, inputBox.firstChild);
+    }
+
+    function removeFileTag() {
+      const tag = document.getElementById('file-tag');
+      if (tag) tag.remove();
+      input._fileText = null;
+      input._fileName = null;
+      updateSendBtn();
+    }
     sendBtn.addEventListener('click', handleSend);
 
     // ── File Upload ────────────────────────────────────────────────────────────
@@ -1259,10 +1282,11 @@
       if (file.name.endsWith('.txt')) {
         // Read txt directly
         const reader = new FileReader();
+
         reader.onload = e => {
-          input.value = e.target.result.trim();
-          input.style.height = 'auto';
-          input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+          input._fileText = e.target.result.trim();
+          input._fileName = file.name;
+          showFileTag(file.name);
           updateSendBtn();
         };
         reader.readAsText(file);
@@ -1273,10 +1297,11 @@
         try {
           const res = await fetch('/extract-text', { method: 'POST', body: formData });
           const data = await res.json();
+
           if (data.text) {
-            input.value = data.text.trim();
-            input.style.height = 'auto';
-            input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+            input._fileText = data.text.trim();
+            input._fileName = file.name;
+            showFileTag(file.name);
             updateSendBtn();
           } else {
             appendError('Could not extract text from PDF.');
@@ -1341,7 +1366,7 @@
 
     // ── Send & stream ──────────────────────────────────────────────────────────
     async function handleSend() {
-      const text = input.value.trim();
+      const text = input._fileText || input.value.trim();
       if (text.length < 5 || isLoading) return;
 
       isLoading = true; updateSendBtn();
@@ -1350,7 +1375,7 @@
       // User bubble shows what they typed
       const userBubble = document.createElement('div');
       userBubble.className = 'msg msg-user';
-      userBubble.innerHTML = `<div class="bubble">${text}</div>`;
+      userBubble.innerHTML = `<div class="bubble">${input._fileName ? `📎 ${input._fileName}` : text}</div>`;
       mainEl.appendChild(userBubble);
 
       const typingEl = document.createElement('div');
@@ -1360,7 +1385,8 @@
 
       // Clear input
       const textForReport = text;
-      input.value = ''; input.style.height = 'auto'; updateSendBtn();
+      input.value = ''; input.style.height = 'auto';
+      removeFileTag(); updateSendBtn();
 
       try {
         const res = await fetch('/predict', {
