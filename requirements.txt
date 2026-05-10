@@ -5,3 +5,5 @@ joblib
 numpy
 pandas
 gunicorn
+tensorflow
+pypdf
