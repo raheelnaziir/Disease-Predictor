@@ -782,7 +782,7 @@
       }
     }
 
-    /* ── Print / PDF styles ──────────────────────────────────────────────── */
+    /* ── Print / PDF styles */
     @media print {
       * {
         -webkit-print-color-adjust: exact !important;
@@ -1230,7 +1230,7 @@
     const mainEl = document.getElementById('main');
     const emptyState = document.getElementById('empty-state');
 
-    // ── Auto-resize textarea ───────────────────────────────────────────────────
+    // Auto-resize textarea
     input.addEventListener('input', () => {
       input.style.height = 'auto';
       input.style.height = Math.min(input.scrollHeight, 120) + 'px';
@@ -1269,7 +1269,7 @@
     }
     sendBtn.addEventListener('click', handleSend);
 
-    // ── File Upload ────────────────────────────────────────────────────────────
+    // File Upload 
     const fileBtn = document.getElementById('file-btn');
     const fileInput = document.getElementById('file-input');
 
@@ -1313,7 +1313,7 @@
       fileInput.value = ''; // reset
     });
 
-    // ── Speech to Text ─────────────────────────────────────────────────────────
+    // Speech to Text 
     const micBtn = document.getElementById('mic-btn');
     let recognition = null;
     let isRecording = false;
@@ -1364,7 +1364,7 @@
       micBtn.style.cursor = 'not-allowed';
     }
 
-    // ── Send & stream ──────────────────────────────────────────────────────────
+    // Send & stream
     async function handleSend() {
       const text = input._fileText || input.value.trim();
       if (text.length < 5 || isLoading) return;
@@ -1457,7 +1457,7 @@
       isLoading = false; updateSendBtn(); scrollBottom();
     }
 
-    // ── Export to PDF ──────────────────────────────────────────────────────────
+    // Export to PDF 
     function exportToPDF() {
       const now = new Date();
       const fullDate = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' at ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -1515,7 +1515,7 @@
 
     function scrollBottom() { mainEl.scrollTo({ top: mainEl.scrollHeight, behavior: 'smooth' }); }
 
-    // ── Settings ───────────────────────────────────────────────────────────────
+    // Settings 
     const modalBg = document.getElementById('modal-bg'), darkToggle = document.getElementById('dark-toggle'), modalTitle = document.getElementById('modal-title'), modalBack = document.getElementById('modal-back'), panelSettings = document.getElementById('panel-settings'), panelAbout = document.getElementById('panel-about'), panelHelp = document.getElementById('panel-help');
     function showPanel(panel, title) { panelSettings.style.display = 'none'; panelAbout.style.display = 'none'; panelHelp.style.display = 'none'; panel.style.display = 'block'; modalTitle.textContent = title; modalBack.style.display = panel === panelSettings ? 'none' : 'flex'; }
     document.getElementById('settings-btn').addEventListener('click', () => { showPanel(panelSettings, 'Settings'); modalBg.classList.add('open'); });
