@@ -72,7 +72,8 @@
       font-family: inherit
     }
 
-    input {
+    input,
+    textarea {
       font-family: inherit
     }
 
@@ -213,12 +214,6 @@
       max-width: 75%;
       font-size: 14px;
       line-height: 1.6
-    }
-
-    .msg-user .bubble .tag-pill {
-      background: rgba(255, 255, 255, .2);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, .3)
     }
 
     .msg-ai {
@@ -399,7 +394,6 @@
       color: #fca5a5
     }
 
-    /* ── Export PDF button ───────────────────────────────────────────────── */
     .export-btn {
       display: inline-flex;
       align-items: center;
@@ -427,6 +421,7 @@
       flex-shrink: 0
     }
 
+    /* ── Footer ─────────────────────────────────────────────────────────── */
     .footer {
       padding: 16px 24px 20px;
       border-top: 1px solid var(--border);
@@ -452,8 +447,8 @@
       border-radius: 24px;
       padding: 12px 18px;
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      align-items: center;
+      gap: 10px;
       transition: border-color var(--transition)
     }
 
@@ -461,42 +456,46 @@
       border-color: var(--accent)
     }
 
-    .tags-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px
-    }
-
-    .tag-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--tag-bg);
-      color: var(--tag-text);
-      font-size: 12px;
-      font-weight: 500;
-      padding: 4px 10px;
-      border-radius: 20px;
-      animation: popIn .2s ease
-    }
-
-    .tag-pill button {
-      color: var(--tag-text);
-      opacity: .7;
-      font-size: 14px;
-      line-height: 1;
-      padding: 0;
-      transition: opacity var(--transition)
-    }
-
-    .tag-pill button:hover {
-      opacity: 1
-    }
-
-    .input-row {
+    /* left action buttons inside input box */
+    .input-actions {
       display: flex;
       align-items: center;
-      gap: 8px
+      gap: 4px;
+      flex-shrink: 0
+    }
+
+    .input-action-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text3);
+      transition: background var(--transition), color var(--transition);
+      flex-shrink: 0
+    }
+
+    .input-action-btn:hover {
+      background: var(--border);
+      color: var(--text2)
+    }
+
+    .input-action-btn.recording {
+      color: #ef4444;
+      animation: pulse 1s infinite
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .4
+      }
     }
 
     #symptom-input {
@@ -506,7 +505,11 @@
       outline: none;
       font-size: 14px;
       color: var(--text);
-      padding: 2px 0
+      padding: 2px 0;
+      resize: none;
+      min-height: 24px;
+      max-height: 120px;
+      line-height: 1.5
     }
 
     #symptom-input::placeholder {
@@ -539,52 +542,17 @@
       cursor: not-allowed
     }
 
-    .autocomplete {
-      position: absolute;
-      bottom: calc(100% + 8px);
-      left: 0;
-      right: 56px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      box-shadow: var(--shadow-lg);
-      max-height: 220px;
-      overflow-y: auto;
-      z-index: 100;
+    /* file upload hint */
+    .file-hint {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 6px;
+      text-align: center
+    }
+
+    /* hidden file input */
+    #file-input {
       display: none
-    }
-
-    .autocomplete.open {
-      display: block;
-      animation: slideUp .15s ease
-    }
-
-    .ac-item {
-      padding: 10px 16px;
-      font-size: 13.5px;
-      color: var(--text);
-      cursor: pointer;
-      transition: background var(--transition);
-      display: flex;
-      align-items: center;
-      gap: 10px
-    }
-
-    .ac-item:hover,
-    .ac-item.active {
-      background: var(--accent-bg);
-      color: var(--accent)
-    }
-
-    .ac-item span.match {
-      font-weight: 600;
-      color: var(--accent)
-    }
-
-    .ac-other {
-      border-top: 1px solid var(--border);
-      color: var(--text2);
-      font-style: italic
     }
 
     .modal-bg {
@@ -820,8 +788,7 @@
 
       body {
         background: #fff !important;
-        color: #000 !important;
-        font-family: 'DM Sans', sans-serif
+        color: #000 !important
       }
 
       .app,
@@ -829,7 +796,6 @@
       .header,
       .footer,
       .msg-user,
-      .autocomplete,
       .send-btn,
       .export-btn,
       .modal-bg {
@@ -1008,9 +974,8 @@
 
 <body>
 
-  <!-- ── Hidden PDF report (only shown during print) ────────────────────── -->
+  <!-- Hidden PDF report -->
   <div id="pdf-report" style="display:none;padding:32px;max-width:800px;margin:0 auto;font-family:'DM Sans',sans-serif">
-
     <div class="pdf-header">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
@@ -1023,19 +988,17 @@
         </div>
       </div>
     </div>
-
     <div class="pdf-section">
       <div class="pdf-section-title">Symptoms Reported</div>
       <div class="pdf-symptoms" id="pdf-symptoms"></div>
     </div>
-
     <div class="pdf-section">
       <div class="pdf-section-title">Primary Prediction</div>
       <table class="pdf-table">
         <tbody>
           <tr>
             <td style="width:160px;font-weight:600">Predicted Condition</td>
-            <td id="pdf-disease" style="font-size:15px;font-weight:700;color:#1a1d23"></td>
+            <td id="pdf-disease" style="font-size:15px;font-weight:700"></td>
           </tr>
           <tr>
             <td style="font-weight:600">Confidence Score</td>
@@ -1059,12 +1022,10 @@
         </tbody>
       </table>
     </div>
-
     <div class="pdf-section">
       <div class="pdf-section-title">About This Condition</div>
       <p id="pdf-description" style="font-size:13px;line-height:1.8;color:#374151"></p>
     </div>
-
     <div class="pdf-section">
       <div class="pdf-section-title">Other Possibilities</div>
       <table class="pdf-table">
@@ -1077,17 +1038,10 @@
         <tbody id="pdf-others"></tbody>
       </table>
     </div>
-
-    <div class="pdf-disclaimer">
-      ⚠️ <strong>Important Disclaimer:</strong> This report is generated by an AI-based educational tool and is
-      <strong>not a substitute for professional medical advice, diagnosis, or treatment.</strong> The predictions are
-      based on symptom patterns and may not be accurate. Always consult a qualified healthcare professional for proper
-      medical evaluation and treatment.
-    </div>
-
-    <div class="pdf-footer">
-      <span>Disease Predictor — AI Symptom Analysis Tool</span>
-      <span id="pdf-footer-date"></span>
+    <div class="pdf-disclaimer">⚠️ <strong>Important Disclaimer:</strong> This report is generated by an AI-based
+      educational tool and is <strong>not a substitute for professional medical advice, diagnosis, or
+        treatment.</strong> Always consult a qualified healthcare professional.</div>
+    <div class="pdf-footer"><span>Disease Predictor — AI Symptom Analysis Tool</span><span id="pdf-footer-date"></span>
     </div>
   </div>
 
@@ -1117,25 +1071,49 @@
             <path d="M12 5v14M5 12h14" />
           </svg></div>
         <h2>How can I help you today?</h2>
-        <p>Describe your symptoms, and I'll predict the most possible disease.</p>
+        <p>Describe your symptoms in plain English, and I'll predict the most possible disease.</p>
       </div>
     </div>
 
     <div class="footer">
       <div class="footer-inner">
+        <!-- hidden file input -->
+        <input type="file" id="file-input" accept=".txt,.pdf" />
+
         <div class="input-wrap">
-          <div class="autocomplete" id="autocomplete"></div>
           <div class="input-box">
-            <div class="tags-row" id="tags-row"></div>
-            <div class="input-row">
-              <input id="symptom-input" type="text" placeholder="Type your symptoms here..." autocomplete="off" />
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-                style="color:var(--text3);flex-shrink:0">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
+            <!-- LEFT: mic + file upload icons -->
+            <div class="input-actions">
+              <!-- File upload button -->
+              <button class="input-action-btn" id="file-btn" title="Upload a .txt or .pdf file">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path
+                    d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                </svg>
+              </button>
+              <!-- Mic / Speech to text button -->
+              <button class="input-action-btn" id="mic-btn" title="Speak your symptoms">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <rect x="9" y="2" width="6" height="11" rx="3" />
+                  <path d="M19 10a7 7 0 0 1-14 0" />
+                  <line x1="12" y1="19" x2="12" y2="22" />
+                  <line x1="8" y1="22" x2="16" y2="22" />
+                </svg>
+              </button>
             </div>
+
+            <!-- FREE TEXT input -->
+            <textarea id="symptom-input" rows="1"
+              placeholder="Describe your symptoms in English... e.g. I have been feeling dizzy and tired with a headache"></textarea>
+
+            <!-- search icon right side -->
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+              style="color:var(--text3);flex-shrink:0">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
           </div>
+
           <button class="send-btn" id="send-btn" disabled>
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <line x1="22" y1="2" x2="11" y2="13" />
@@ -1143,10 +1121,12 @@
             </svg>
           </button>
         </div>
+        <div class="file-hint">Supports .txt and .pdf file upload · or speak your symptoms with the mic</div>
       </div>
     </div>
   </div>
 
+  <!-- Settings modal -->
   <div class="modal-bg" id="modal-bg">
     <div class="modal">
       <div class="modal-header">
@@ -1195,9 +1175,10 @@
       </div>
       <div class="modal-body" id="panel-about" style="display:none;padding:16px 24px 24px">
         <p style="font-size:13.5px;color:var(--text2);line-height:1.8">This tool uses a <strong
-            style="color:var(--text)">Random Forest</strong> machine learning model trained on a dataset of 41 diseases
-          and ~130 symptoms.</p><br>
-        <p style="font-size:12px;color:var(--text3)">Built with Python · Flask · scikit-learn · HTML/CSS/JS</p><br>
+            style="color:var(--text)">Neural Network + Random Forest Ensemble</strong> trained on 41 diseases and ~130
+          symptoms, with NLP-based symptom extraction from free text.</p><br>
+        <p style="font-size:12px;color:var(--text3)">Built with Python · Flask · TensorFlow · scikit-learn · HTML/CSS/JS
+        </p><br>
         <p
           style="font-size:12px;color:var(--text3);background:var(--surface2);padding:10px 14px;border-radius:8px;border:1px solid var(--border)">
           For educational purposes only. Not a substitute for professional medical advice.</p>
@@ -1208,8 +1189,9 @@
           How to use</p>
         <ul
           style="padding-left:16px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--text2);line-height:1.6">
-          <li>Type a symptom in the input box and select from suggestions</li>
-          <li>Add multiple symptoms for better accuracy</li>
+          <li>Type your symptoms in plain English in the input box</li>
+          <li>Or click the <strong style="color:var(--text)">📎 paperclip</strong> to upload a .txt or .pdf file</li>
+          <li>Or click the <strong style="color:var(--text)">🎤 mic</strong> to speak your symptoms</li>
           <li>Press send or hit <strong style="color:var(--text)">Enter</strong> to get your prediction</li>
         </ul><br>
         <p
@@ -1217,8 +1199,9 @@
           Tips</p>
         <ul
           style="padding-left:16px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--text2);line-height:1.6">
-          <li>Add at least <strong style="color:var(--text)">3–4 symptoms</strong> for best accuracy</li>
-          <li>Use "Add manually" if your symptom isn't in the list</li>
+          <li>Be descriptive — mention at least 3–4 symptoms</li>
+          <li>Example: <em style="color:var(--text3)">"I have been feeling dizzy and tired with a headache and frequent
+              urination"</em></li>
           <li>The confidence bar shows how certain the model is</li>
         </ul><br>
         <p
@@ -1229,58 +1212,143 @@
   </div>
 
   <script>
-    let allSymptoms = [], diseaseInfoData = {}, selectedSymptoms = [], acIndex = -1, isLoading = false;
-    let lastReport = { symptoms: [], disease: '', confidence: '', severity: '', specialist: '', description: '', others: [] };
+    let diseaseInfoData = {}, isLoading = false;
+    let lastReport = { symptoms: '', disease: '', confidence: '', severity: '', specialist: '', description: '', others: [] };
 
     async function init() {
       try {
-        const [s, d] = await Promise.all([fetch('/symptoms'), fetch('/disease_info')]);
-        allSymptoms = await s.json(); diseaseInfoData = await d.json();
+        const d = await fetch('/disease_info');
+        diseaseInfoData = await d.json();
       } catch (e) { console.error('Init error', e); }
     }
     init();
 
-    const input = document.getElementById('symptom-input'), tagsRow = document.getElementById('tags-row'), ac = document.getElementById('autocomplete'), sendBtn = document.getElementById('send-btn'), mainEl = document.getElementById('main'), emptyState = document.getElementById('empty-state');
+    const input = document.getElementById('symptom-input');
+    const sendBtn = document.getElementById('send-btn');
+    const mainEl = document.getElementById('main');
+    const emptyState = document.getElementById('empty-state');
 
+    // ── Auto-resize textarea ───────────────────────────────────────────────────
     input.addEventListener('input', () => {
-      const q = input.value.trim().toLowerCase();
-      if (!q) { closeAc(); return; }
-      const matches = allSymptoms.filter(s => s.toLowerCase().includes(q) && !selectedSymptoms.includes(s)).slice(0, 8);
-      if (!matches.length && q.length < 3) { closeAc(); return; }
-      let html = matches.map((s, i) => { const hi = s.replace(new RegExp(`(${q})`, 'gi'), '<span class="match">$1</span>'); return `<div class="ac-item" data-val="${s}">${hi}</div>`; }).join('');
-      html += `<div class="ac-item ac-other" data-val="__other__">+ Add "${input.value.trim()}" manually</div>`;
-      ac.innerHTML = html; ac.classList.add('open'); acIndex = -1;
-      ac.querySelectorAll('.ac-item').forEach(el => el.addEventListener('mousedown', e => { e.preventDefault(); selectSymptom(el.dataset.val === '__other__' ? input.value.trim() : el.dataset.val); }));
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+      updateSendBtn();
     });
 
     input.addEventListener('keydown', e => {
-      const items = ac.querySelectorAll('.ac-item');
-      if (e.key === 'ArrowDown') { e.preventDefault(); acIndex = Math.min(acIndex + 1, items.length - 1); highlightAc(items); }
-      else if (e.key === 'ArrowUp') { e.preventDefault(); acIndex = Math.max(acIndex - 1, 0); highlightAc(items); }
-      else if (e.key === 'Enter') { e.preventDefault(); if (acIndex >= 0 && items[acIndex]) { const v = items[acIndex].dataset.val; selectSymptom(v === '__other__' ? input.value.trim() : v); } else if (input.value.trim()) { selectSymptom(input.value.trim()); } else { handleSend(); } }
-      else if (e.key === 'Escape') closeAc();
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
     });
 
-    function highlightAc(items) { items.forEach((el, i) => el.classList.toggle('active', i === acIndex)); if (items[acIndex]) items[acIndex].scrollIntoView({ block: 'nearest' }); }
-    document.addEventListener('click', e => { if (!ac.contains(e.target) && e.target !== input) closeAc(); });
-    function closeAc() { ac.classList.remove('open'); ac.innerHTML = ''; acIndex = -1; }
-    function selectSymptom(val) { if (!val || selectedSymptoms.includes(val)) { closeAc(); input.value = ''; return; } selectedSymptoms.push(val); renderTags(); input.value = ''; closeAc(); input.focus(); updateSendBtn(); }
-    function removeSymptom(val) { selectedSymptoms = selectedSymptoms.filter(s => s !== val); renderTags(); updateSendBtn(); }
-    function renderTags() { tagsRow.innerHTML = selectedSymptoms.map(s => `<span class="tag-pill">${s}<button onclick="removeSymptom('${s}')">×</button></span>`).join(''); tagsRow.style.display = selectedSymptoms.length ? 'flex' : 'none'; }
-    function updateSendBtn() { sendBtn.disabled = selectedSymptoms.length === 0 || isLoading; }
-
+    function updateSendBtn() {
+      sendBtn.disabled = input.value.trim().length < 5 || isLoading;
+    }
     sendBtn.addEventListener('click', handleSend);
 
+    // ── File Upload ────────────────────────────────────────────────────────────
+    const fileBtn = document.getElementById('file-btn');
+    const fileInput = document.getElementById('file-input');
+
+    fileBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      if (file.name.endsWith('.txt')) {
+        // Read txt directly
+        const reader = new FileReader();
+        reader.onload = e => {
+          input.value = e.target.result.trim();
+          input.style.height = 'auto';
+          input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+          updateSendBtn();
+        };
+        reader.readAsText(file);
+      } else if (file.name.endsWith('.pdf')) {
+        // Send to backend for extraction
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+          const res = await fetch('/extract-text', { method: 'POST', body: formData });
+          const data = await res.json();
+          if (data.text) {
+            input.value = data.text.trim();
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+            updateSendBtn();
+          } else {
+            appendError('Could not extract text from PDF.');
+          }
+        } catch (e) {
+          appendError('PDF extraction failed. Try a .txt file instead.');
+        }
+      }
+      fileInput.value = ''; // reset
+    });
+
+    // ── Speech to Text ─────────────────────────────────────────────────────────
+    const micBtn = document.getElementById('mic-btn');
+    let recognition = null;
+    let isRecording = false;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        input.value = transcript;
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+        updateSendBtn();
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        micBtn.classList.remove('recording');
+        micBtn.title = 'Speak your symptoms';
+      };
+
+      recognition.onerror = () => {
+        isRecording = false;
+        micBtn.classList.remove('recording');
+      };
+
+      micBtn.addEventListener('click', () => {
+        if (isRecording) {
+          recognition.stop();
+        } else {
+          recognition.start();
+          isRecording = true;
+          micBtn.classList.add('recording');
+          micBtn.title = 'Recording... click to stop';
+        }
+      });
+    } else {
+      // Browser doesn't support speech recognition
+      micBtn.title = 'Speech recognition not supported in this browser';
+      micBtn.style.opacity = '0.4';
+      micBtn.style.cursor = 'not-allowed';
+    }
+
+    // ── Send & stream ──────────────────────────────────────────────────────────
     async function handleSend() {
-      if (!selectedSymptoms.length || isLoading) return;
+      const text = input.value.trim();
+      if (text.length < 5 || isLoading) return;
+
       isLoading = true; updateSendBtn();
       emptyState.style.display = 'none';
 
-      const symptomsForReport = [...selectedSymptoms];
-
+      // User bubble shows what they typed
       const userBubble = document.createElement('div');
       userBubble.className = 'msg msg-user';
-      userBubble.innerHTML = `<div class="bubble">${selectedSymptoms.map(s => `<span class="tag-pill">${s}</span>`).join(' ')}</div>`;
+      userBubble.innerHTML = `<div class="bubble">${text}</div>`;
       mainEl.appendChild(userBubble);
 
       const typingEl = document.createElement('div');
@@ -1288,17 +1356,26 @@
       typingEl.innerHTML = `<div class="ai-avatar"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="bubble-ai"><div class="typing-dot"><span></span><span></span><span></span></div></div>`;
       mainEl.appendChild(typingEl); scrollBottom();
 
-      const payload = { symptoms: [...selectedSymptoms] };
-      selectedSymptoms = []; renderTags(); updateSendBtn();
+      // Clear input
+      const textForReport = text;
+      input.value = ''; input.style.height = 'auto'; updateSendBtn();
 
       try {
-        const res = await fetch('/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const res = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: textForReport })   // send free text
+        });
+
         const aiBubble = document.createElement('div'); aiBubble.className = 'msg msg-ai';
         const aiContent = document.createElement('div'); aiContent.className = 'bubble-ai'; aiContent.innerHTML = '<span class="cursor"></span>';
         aiBubble.innerHTML = `<div class="ai-avatar"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>`;
         aiBubble.appendChild(aiContent); typingEl.replaceWith(aiBubble);
 
-        if (!res.ok) { const err = await res.json(); aiBubble.remove(); appendError(err.error || 'Invalid input.'); isLoading = false; updateSendBtn(); return; }
+        if (!res.ok) {
+          const err = await res.json(); aiBubble.remove();
+          appendError(err.error || 'Could not process your input.'); isLoading = false; updateSendBtn(); return;
+        }
 
         const reader = res.body.getReader(), decoder = new TextDecoder();
         let rawText = '', buffer = '';
@@ -1307,27 +1384,28 @@
           buffer += decoder.decode(value, { stream: true });
           const lines = buffer.split('\n'); buffer = lines.pop();
           for (const line of lines) {
-            if (!line.startsWith('data: ')) continue; const chunk = line.slice(6); if (chunk === '[DONE]') break;
+            if (!line.startsWith('data: ')) continue;
+            const chunk = line.slice(6); if (chunk === '[DONE]') break;
             try { rawText += JSON.parse(chunk); } catch { }
             aiContent.innerHTML = renderMarkdown(rawText) + '<span class="cursor"></span>';
             animateConfBar(aiContent, rawText); scrollBottom();
           }
         }
 
-        // Parse results for report
+        // Parse for report & table
         const diseaseMatch = rawText.match(/## Predicted Condition\n\*\*(.+?)\*\*/);
         const confMatch = rawText.match(/Confidence Score\n([\d.]+)%/);
         const sevMatch = rawText.match(/Severity\n(.+?)\n/);
         const specMatch = rawText.match(/Recommended Specialist\n(.+?)\n/);
         const descMatch = rawText.match(/About This Condition\n(.+?)(?=\n###|\n---)/s);
         const othersMatch = [...rawText.matchAll(/- \*\*(.+?)\*\* — ([\d.]+)%/g)];
+        const symptomsMatch = rawText.match(/Extracted Symptoms\n(.+?)\n/);
 
         const diseaseName = diseaseMatch ? diseaseMatch[1].trim() : '';
         const info = diseaseInfoData[diseaseName] || {};
 
-        // Store for PDF
         lastReport = {
-          symptoms: symptomsForReport,
+          symptoms: symptomsMatch ? symptomsMatch[1] : textForReport,
           disease: diseaseName,
           confidence: confMatch ? confMatch[1] : '—',
           severity: sevMatch ? sevMatch[1].trim() : (info.severity || '—'),
@@ -1338,11 +1416,9 @@
 
         aiContent.innerHTML = renderMarkdown(rawText);
         animateConfBar(aiContent, rawText);
-
-        // Build disease table
         if (diseaseName) { const t = buildDiseaseTable(diseaseName); if (t) aiContent.appendChild(t); }
 
-        // Add Export PDF button
+        // Export PDF button
         const exportBtn = document.createElement('button');
         exportBtn.className = 'export-btn';
         exportBtn.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export PDF Report`;
@@ -1356,45 +1432,23 @@
     // ── Export to PDF ──────────────────────────────────────────────────────────
     function exportToPDF() {
       const now = new Date();
-      const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-      const fullDate = `${dateStr} at ${timeStr}`;
-
-      // Fill in date
+      const fullDate = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' at ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
       document.getElementById('pdf-date').textContent = 'Generated on ' + fullDate;
       document.getElementById('pdf-footer-date').textContent = fullDate;
-
-      // Fill symptoms
-      document.getElementById('pdf-symptoms').innerHTML =
-        lastReport.symptoms.map(s => `<span class="pdf-symptom-tag">${s}</span>`).join('');
-
-      // Fill disease
+      document.getElementById('pdf-symptoms').innerHTML = `<span class="pdf-symptom-tag" style="font-style:italic">${lastReport.symptoms}</span>`;
       document.getElementById('pdf-disease').textContent = lastReport.disease;
-
-      // Fill confidence bar
       const conf = parseFloat(lastReport.confidence) || 0;
       document.getElementById('pdf-conf-fill').style.width = conf + '%';
       document.getElementById('pdf-conf-label').textContent = conf.toFixed(1) + '%';
-
-      // Fill severity with badge
       const sev = (lastReport.severity || '').toLowerCase();
-      let badgeClass = 'pdf-badge-mild';
-      if (sev.includes('critical')) badgeClass = 'pdf-badge-critical';
-      else if (sev.includes('severe')) badgeClass = 'pdf-badge-severe';
-      else if (sev.includes('moderate')) badgeClass = 'pdf-badge-moderate';
-      document.getElementById('pdf-severity').innerHTML =
-        `<span class="pdf-badge ${badgeClass}">${lastReport.severity}</span>`;
-
-      // Fill specialist & description
+      let bc = 'pdf-badge-mild';
+      if (sev.includes('critical')) bc = 'pdf-badge-critical'; else if (sev.includes('severe')) bc = 'pdf-badge-severe'; else if (sev.includes('moderate')) bc = 'pdf-badge-moderate';
+      document.getElementById('pdf-severity').innerHTML = `<span class="pdf-badge ${bc}">${lastReport.severity}</span>`;
       document.getElementById('pdf-specialist').textContent = lastReport.specialist;
       document.getElementById('pdf-description').textContent = lastReport.description;
-
-      // Fill other possibilities
       document.getElementById('pdf-others').innerHTML = lastReport.others.length
         ? lastReport.others.map(o => `<tr><td>${o.name}</td><td style="font-weight:600;color:#2563eb">${o.conf}%</td></tr>`).join('')
         : '<tr><td colspan="2" style="color:#9ca3af;font-style:italic">No alternatives recorded</td></tr>';
-
-      // Trigger print
       window.print();
     }
 
@@ -1402,9 +1456,7 @@
       const info = diseaseInfoData[name]; if (!info) return null;
       const sev = (info.severity || '').toLowerCase();
       let sc = 'sev-mild';
-      if (sev.includes('critical')) sc = 'sev-critical';
-      else if (sev.includes('severe')) sc = 'sev-severe';
-      else if (sev.includes('moderate')) sc = 'sev-moderate';
+      if (sev.includes('critical')) sc = 'sev-critical'; else if (sev.includes('severe')) sc = 'sev-severe'; else if (sev.includes('moderate')) sc = 'sev-moderate';
       const w = document.createElement('div'); w.style.marginTop = '16px';
       w.innerHTML = `<h3 style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Disease Summary</h3>
   <table class="disease-table"><thead><tr><th>Field</th><th>Details</th></tr></thead><tbody>
@@ -1435,15 +1487,13 @@
 
     function scrollBottom() { mainEl.scrollTo({ top: mainEl.scrollHeight, behavior: 'smooth' }); }
 
+    // ── Settings ───────────────────────────────────────────────────────────────
     const modalBg = document.getElementById('modal-bg'), darkToggle = document.getElementById('dark-toggle'), modalTitle = document.getElementById('modal-title'), modalBack = document.getElementById('modal-back'), panelSettings = document.getElementById('panel-settings'), panelAbout = document.getElementById('panel-about'), panelHelp = document.getElementById('panel-help');
-
     function showPanel(panel, title) { panelSettings.style.display = 'none'; panelAbout.style.display = 'none'; panelHelp.style.display = 'none'; panel.style.display = 'block'; modalTitle.textContent = title; modalBack.style.display = panel === panelSettings ? 'none' : 'flex'; }
-
     document.getElementById('settings-btn').addEventListener('click', () => { showPanel(panelSettings, 'Settings'); modalBg.classList.add('open'); });
     document.getElementById('modal-close').addEventListener('click', () => modalBg.classList.remove('open'));
     modalBg.addEventListener('click', e => { if (e.target === modalBg) modalBg.classList.remove('open'); });
     modalBack.addEventListener('click', () => showPanel(panelSettings, 'Settings'));
-
     const saved = localStorage.getItem('theme');
     if (saved === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); darkToggle.classList.add('on'); }
     darkToggle.addEventListener('click', () => { const isDark = document.documentElement.getAttribute('data-theme') === 'dark'; document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark'); darkToggle.classList.toggle('on', !isDark); localStorage.setItem('theme', isDark ? 'light' : 'dark'); });
